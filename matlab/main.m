@@ -4,7 +4,7 @@ date = ["07 01 2020.mat"; "07 04 2020.mat";"07 07 2020.mat"; "07 10 2020.mat"];
 %algemeen
 Av_commute = 23; %km
 jaarlijkse_afstand = 15000; %km/auto
-aantal_autos = 100; %nog aan te passen 
+aantal_autos = 500; %nog aan te passen 
 lifetime = 4; %gebruikstijd van de bedrijfswagen
 discount_rate = 0.02; %nog opzoeken wat de discount rate hiervoor is
 %Nissan leaf data
@@ -33,6 +33,12 @@ fast_charger_capacity = 50; %kW/paal
 slow_charger_capacity = 7.4; %kW/paal
 max_charging_cap = fast_chargers*fast_charger_capacity + slow_chargers*slow_charger_capacity;
 % Diesel auto costen
+Citroen_kost = 25903; %aankoopprijs citroen c4
+Citroen_resale = 11785; % resale value na 4 jaar
+Citroen_verbruik = 5.52/100; %l/km
+Diesel_prijs = 0.082; 
+Diesel_per_jaar = jaarlijke_afstand *Citroen_verbruik; %l per jaar
+
 %% Waarden voor chargen
 ev_charge = 673; %total charge needed per day for total ev fleet in kwh
 %max_charging_cap = 5*1000; %max charging capacity in kw
