@@ -37,7 +37,7 @@ Citroen_kost = 25903; %aankoopprijs citroen c4
 Citroen_resale = 11785; % resale value na 4 jaar
 Citroen_verbruik = 5.52/100; %l/km
 Diesel_prijs = 0.082; 
-Diesel_per_jaar = jaarlijke_afstand *Citroen_verbruik; %l per jaar
+Diesel_per_jaar = jaarlijkse_afstand *Citroen_verbruik; %l per jaar
 Citroen_fuel_cost = Diesel_per_jaar * Diesel_prijs; %fuel cost per jaar
 Citroen_maintanance = 500; %euro per jaar BRON ZOEKEN 
 
@@ -47,7 +47,7 @@ Citroen_resale = 11785; % resale value na 4 jaar
 Citroen_verbruik = 5.52/100; %l/km
 Diesel_prijs = 0.082; 
 %% Waarden voor chargen
-ev_charge = 673; %total charge needed per day for total ev fleet in kwh
+ev_charge = laadbeurten*battery_actual*aantal_autos/365; %total charge needed per day for total ev fleet in kwh
 %max_charging_cap = 5*1000; %max charging capacity in kw
 ev_charge_initial = 1846; %initial charge of total ev fleet at the start of the day in kwh
 
@@ -76,3 +76,4 @@ for i = 1:size(date,1)
     plot(x_axis, x(i,:),x_axis,10*dam_9_5(:,i));
     title(date(i))
 end
+
