@@ -38,6 +38,8 @@ Citroen_resale = 11785; % resale value na 4 jaar
 Citroen_verbruik = 5.52/100; %l/km
 Diesel_prijs = 0.082; 
 Diesel_per_jaar = jaarlijke_afstand *Citroen_verbruik; %l per jaar
+Citroen_fuel_cost = Diesel_per_jaar * Diesel_prijs; %fuel cost per jaar
+Citroen_maintanance = 500; %euro per jaar BRON ZOEKEN 
 
 %% Waarden voor chargen
 ev_charge = 673; %total charge needed per day for total ev fleet in kwh
