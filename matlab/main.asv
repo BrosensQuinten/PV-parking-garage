@@ -29,13 +29,12 @@ slow_charging_aandeel = (1-fast_charging_aandeel);
 fast_chargers = fast_charging_aandeel*aantal_autos;
 slow_chargers = slow_charging_aandeel*aantal_autos;
 Charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_autos + fast_charger_cost*fast_chargers + slow_charger_cost*slow_chargers;
-fast_charger_capacity = 50; %kW/paal
+fast_charger_capacity = 40; %kW/paal
 slow_charger_capacity = 7.4; %kW/paal
-max_charging_cap = fast_chargers*fast_charger_capacity + slow_chargers*slow_charger_capacity;
-% Diesel auto costen
+max_charging_cap = fast_chargers*fast_charger_capacity
 %% Waarden voor chargen
 ev_charge = 673; %total charge needed per day for total ev fleet in kwh
-%max_charging_cap = 5*1000; %max charging capacity in kw
+max_charging_cap = 5*1000; %max charging capacity in kw
 ev_charge_initial = 1846; %initial charge of total ev fleet at the start of the day in kwh
 
 %%
