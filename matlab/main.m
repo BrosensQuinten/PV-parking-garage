@@ -26,7 +26,7 @@ fixed_installation_cost = 47000;
 marginal_installation_cost = 4000;
 fast_charger_cost = 10000;
 slow_charger_cost = 644; 
-fast_charging_aandeel = 1;
+fast_charging_aandeel = 0;
 slow_charging_aandeel = (1-fast_charging_aandeel);
 fast_chargers = fast_charging_aandeel*aantal_autos;
 slow_chargers = slow_charging_aandeel*aantal_autos;
@@ -49,18 +49,18 @@ ev_charge = energy_day;
 %max_charging_cap = 5*1000; %max charging capacity in kw
 ev_charge_initial = aantal_autos*battery_actual - ev_charge; %DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
                           %initial charge of total ev fleet at the start of the day in kwh
-
+ev_charge_max = battery_actual * aantal_autos; %
 %%
 %% belpex waarden formatteren
 Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
 Belpex = Belpex(9:17,:);
-%%
+%% slow charging
 
 for i = 1:size(Belpex,2)
 %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
 %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
 
-[x(i,:), fval(i,1)] = loadProfile(Belpex(:,i), ev_charge, max_charging_cap,ev_charge_initial);
+[x(i,:), fval(i,1)] = loadProfile(Belpex(:,i), ev_charge_max, max_charging_cap,ev_charge_initial);
 
 end
 
@@ -73,9 +73,18 @@ monthdays = [31 28 31 30 31 30 31 31 30 31 30 31];
 figure
 for i = 1:12
    subplot(2,6,i)
-   plot(x_axis, x(i,:),x_axis,100*Belpex(:,sum(monthdays(1:i))));
+   plot(x_axis, x(i,:),x_axis,1000*Belpex(:,sum(monthdays(1:i))));
    title(i)
 end
+
+%% plotjes battery charge
+for i = 1:size(x,1)
+    for j =  1:size(x,2)
+        battery_charge(i,1) = ev_charge_initial;
+        battery_charge(i,j+1)= battery_charge(i,j) + x(i,j);
+    end
+end
+
 %% NPV berekening
 electricity_cost = sum(fval); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost

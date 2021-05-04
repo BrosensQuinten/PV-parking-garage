@@ -73,9 +73,18 @@ monthdays = [31 28 31 30 31 30 31 31 30 31 30 31];
 figure
 for i = 1:12
    subplot(2,6,i)
-   plot(x_axis, x(i,:),x_axis,10*Belpex(:,i));
-   title(i, ' = month')
+   plot(x_axis, x(i,:),x_axis,100*Belpex(:,sum(monthdays(1:i))));
+   title(i)
 end
+
+%% plotjes battery charge
+for i = 1:size(x,1)
+    for j =  2:size(x,2)
+        battery_charge(i,1) = initial_charge;
+        battery_charge(i,j)= ;
+    end
+end
+
 %% NPV berekening
 electricity_cost = sum(fval); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
