@@ -99,7 +99,7 @@ end
 [battery_slow] = battery_charge(x_slow, slow_charge_initial);
 [battery_fast] = battery_charge(x_fast, fast_charge_initial);
 %% NPV berekening
-electricity_cost = sum(fval); %kost voor elektriciteit per jaar
+electricity_cost = sum(fval_slow) + sum(fval_fast); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
 opex_ev = electricity_cost;
 opex_diesel = aantal_autos*(Citroen_fuel_cost+Citroen_maintanance);
