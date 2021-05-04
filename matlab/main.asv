@@ -46,7 +46,7 @@ Citroen_maintanance = 500; %euro per jaar BRON ZOEKEN
 %% Waarden voor chargen
 ev_charge = laadbeurten*battery_actual*aantal_autos/365; %total charge needed per day for total ev fleet in kwh
 %max_charging_cap = 5*1000; %max charging capacity in kw
-ev_charge_initial = aantal_autos*battery_actual - ev_charge; %DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
+ev_charge_initial = 1846; %DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
                           %initial charge of total ev fleet at the start of the day in kwh
 
 %%
