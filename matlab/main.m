@@ -16,7 +16,7 @@ battery_efficiency = 0.164; %kWh/km
 battery_useful = 0.7;
 battery_actual = battery_useful*battery_capacity;
 laadbeurten = jaarlijkse_afstand*battery_efficiency/battery_actual; %aantal laadbeurten per jaar
-energy_year = laadbeurten*battery_actual; %kWh per jaar per auto
+energy_year = laadbeurten*battery_actual*aantal_autos; %kWh per jaar per auto
 energy_day = energy_year/365;
 Nissan_cost = 30000; %aankoop kost nissan leaf
 Nissan_resale = 4322.25; %resalevalue na 4 jaar
@@ -44,7 +44,8 @@ Citroen_fuel_cost = Diesel_per_jaar * Diesel_prijs; %fuel cost per jaar
 Citroen_maintanance = 500; %euro per jaar BRON ZOEKEN 
 
 %% Waarden voor chargen
-ev_charge = laadbeurten*battery_actual*aantal_autos/365; %total charge needed per day for total ev fleet in kwh
+%ev_charge = laadbeurten*battery_actual*aantal_autos/365; %total charge needed per day for total ev fleet in kwh
+ev_charge = energy_day;
 %max_charging_cap = 5*1000; %max charging capacity in kw
 ev_charge_initial = aantal_autos*battery_actual - ev_charge; %DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
                           %initial charge of total ev fleet at the start of the day in kwh
@@ -66,14 +67,16 @@ end
 %% battery state of charge
 %for i = 1: size(
    
-%%
-%x_axis = [9 10 11 12 13 14 15 16 17];
-%figure
-%for i = 1:size(date,1)
-%    subplot(2,2,i)
-%    plot(x_axis, x(i,:),x_axis,10*dam_9_5(:,i));
-%    title(date(i))
-%end
+%% plotjes
+x_axis = [9 10 11 12 13 14 15 16 17];
+monthdays = [31 28 31 30 31 30 31 31 30 31 30 31];
+figure
+for i = 1:12
+   subplot(2,6,i)
+   plot(x_axis, x(i,:),x_axis,100*Belpex(:,sum(monthdays(1:i))));
+   title(i)
+end
+%% NPV berekening
 electricity_cost = sum(fval); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
 opex_ev = electricity_cost;
