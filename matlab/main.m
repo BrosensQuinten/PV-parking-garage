@@ -96,13 +96,8 @@ for i = 1:12
 end
 
 %% plotjes battery charge
-for i = 1:size(x,1)
-    for j =  1:size(x,2)
-        battery_charge(i,1) = ev_charge_initial;
-        battery_charge(i,j+1)= battery_charge(i,j) + x(i,j);
-    end
-end
-
+[battery_slow] = battery_charge(x_slow, slow_charge_initial);
+[battery_fast] = battery_charge(x_fast, fast_charge_initial);
 %% NPV berekening
 electricity_cost = sum(fval); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
