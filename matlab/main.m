@@ -26,7 +26,7 @@ fixed_installation_cost = 47000;
 marginal_installation_cost = 4000;
 fast_charger_cost = 10000;
 slow_charger_cost = 644; 
-fast_charging_aandeel = 1;
+fast_charging_aandeel = 0.5;
 slow_charging_aandeel = (1-fast_charging_aandeel);
 fast_chargers = fast_charging_aandeel*aantal_autos;
 slow_chargers = slow_charging_aandeel*aantal_autos;
@@ -34,6 +34,8 @@ charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_autos
 fast_charger_capacity = 50; %kW/paal
 slow_charger_capacity = 7.4; %kW/paal
 max_charging_cap = fast_chargers*fast_charger_capacity + slow_chargers*slow_charger_capacity;
+fast_charging_cap = fast_chargers*fast_charger_capacity;
+slow_charging_cap = slow_chargers*slow_charger_capacity;
 % Diesel auto costen
 Citroen_kost = 25903; %aankoopprijs citroen c4
 Citroen_resale = 11785; % resale value na 4 jaar
@@ -50,20 +52,36 @@ ev_charge = energy_day;
 ev_charge_initial = aantal_autos*battery_actual - ev_charge; %DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
                           %initial charge of total ev fleet at the start of the day in kwh
 ev_charge_max = battery_actual * aantal_autos; %
-%%
+
+%% fast and slow charging differentiation
+slow_charge_initial = ev_charge_initial * slow_charging_aandeel;
+fast_charge_initial = ev_charge_initial*fast_charging_aandeel;
+slow_charge_max = ev_charge_max * slow_charging_aandeel;
+fast_charge_max = ev_charge_max * fast_charging_aandeel;
+
 %% belpex waarden formatteren
 Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
 Belpex = Belpex(9:17,:);
-%% slow charging
+
+%% slow charging optimalization
 
 for i = 1:size(Belpex,2)
 %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
 %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
 
-[x(i,:), fval(i,1)] = loadProfile(Belpex(:,i), ev_charge_max, max_charging_cap,ev_charge_initial);
+[x_slow(i,:), fval_slow(i,1)] = loadProfile(Belpex(:,i), slow_charge_max, slow_charging_cap ,slow_charge_initial);
 
 end
 
+
+%% fast charging optimalization
+for i = 1:size(Belpex,2)
+%dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
+%dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
+
+[x_fast(i,:), fval_fast(i,1)] = loadProfile(Belpex(:,i), fast_charge_max, fast_charging_cap ,fast_charge_initial);
+
+end
 %% battery state of charge
 %for i = 1: size(
    
@@ -73,7 +91,7 @@ monthdays = [31 28 31 30 31 30 31 31 30 31 30 31];
 figure
 for i = 1:12
    subplot(2,6,i)
-   plot(x_axis, x(i,:),x_axis,1000*Belpex(:,sum(monthdays(1:i))));
+   plot(x_axis, x_slow(i,:),x_axis,1000*Belpex(:,sum(monthdays(1:i))), x_axis, x_fast(i,:));
    title(i)
 end
 
