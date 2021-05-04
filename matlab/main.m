@@ -8,7 +8,7 @@ aantal_autos = 500; %nog aan te passen
 lifetime = 4; %gebruikstijd van de bedrijfswagen
 lifetime_chargers = 25;
 time_horizon = lifetime_chargers;
-discount_rate = 0.02; %nog opzoeken wat de discount rate hiervoor is
+discount_rate = 0.0477; %nog opzoeken wat de discount rate hiervoor is
 %Nissan leaf data
 battery_capacity = 36; %kWh
 battery_range = 220; %km
@@ -26,7 +26,7 @@ fixed_installation_cost = 47000;
 marginal_installation_cost = 4000;
 fast_charger_cost = 10000;
 slow_charger_cost = 644; 
-fast_charging_aandeel = 0.5;
+fast_charging_aandeel = 0;
 slow_charging_aandeel = (1-fast_charging_aandeel);
 fast_chargers = fast_charging_aandeel*aantal_autos;
 slow_chargers = slow_charging_aandeel*aantal_autos;
