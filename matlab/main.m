@@ -61,7 +61,7 @@ fast_charge_max = ev_charge_max * fast_charging_aandeel;
 
 %% belpex waarden formatteren
 Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
-Belpex = Belpex(9:17,:);
+Belpex = flip(Belpex(9:17,:))/1000;
 
 %% slow charging optimalization
 
