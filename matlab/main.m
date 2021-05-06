@@ -8,7 +8,7 @@ aantal_autos = 500; %nog aan te passen
 lifetime = 4; %gebruikstijd van de bedrijfswagen
 lifetime_chargers = 25;
 time_horizon = lifetime_chargers;
-discount_rate = 0.02; %nog opzoeken wat de discount rate hiervoor is
+discount_rate = 0.0477; %nog opzoeken wat de discount rate hiervoor is
 %Nissan leaf data
 battery_capacity = 36; %kWh
 battery_range = 220; %km
