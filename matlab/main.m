@@ -19,7 +19,7 @@ laadbeurten = jaarlijkse_afstand*battery_efficiency/battery_actual; %aantal laad
 energy_year = laadbeurten*battery_actual*aantal_autos; %kWh per jaar per auto
 energy_day = energy_year/365;
 Nissan_cost = 30000; %aankoop kost nissan leaf
-Nissan_resale = 4322.25; %resalevalue na 4 jaar
+Nissan_resale = 0.83*10876; %resalevalue na 4 jaar
 
 %data charging stations
 fixed_installation_cost = 47000;
@@ -31,7 +31,7 @@ slow_charging_aandeel = (1-fast_charging_aandeel);
 fast_chargers = fast_charging_aandeel*aantal_autos;
 slow_chargers = slow_charging_aandeel*aantal_autos;
 charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_autos + fast_charger_cost*fast_chargers + slow_charger_cost*slow_chargers;
-fast_charger_capacity = 50; %kW/paal
+fast_charger_capacity = 40; %kW/paal
 slow_charger_capacity = 7.4; %kW/paal
 max_charging_cap = fast_chargers*fast_charger_capacity + slow_chargers*slow_charger_capacity;
 fast_charging_cap = fast_chargers*fast_charger_capacity;
