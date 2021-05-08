@@ -19,7 +19,7 @@ laadbeurten = jaarlijkse_afstand*battery_efficiency/battery_actual; %aantal laad
 energy_year = laadbeurten*battery_actual*aantal_autos; %kWh per jaar per auto
 energy_day = energy_year/365;
 Nissan_cost = 30000; %aankoop kost nissan leaf
-Nissan_resale = 10876; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
+Nissan_resale = 28.07*Nissan_cost ; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 % 28.07% na zes jaar
 
 %data charging stations
 aantal_chargers = 250;
@@ -33,7 +33,7 @@ max_charging_cap = aantal_chargers*slow_charger_capacity;
 charging_cap = aantal_chargers*slow_charger_capacity;
 % Diesel auto costen
 Citroen_kost = 25903; %aankoopprijs citroen c4
-Citroen_resale = 11785; % resale value na 4 jaar 11785 na tien jaar 4255
+Citroen_resale = 7245; % resale value na 4 jaar 11785 na tien jaar 4255. 7245 na zes jaar
 Citroen_verbruik = 5.52/100; %l/km
 Diesel_prijs = 1.3445; %euro per liter 
 Diesel_per_jaar = jaarlijkse_afstand *Citroen_verbruik; %l per jaar
