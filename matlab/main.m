@@ -19,7 +19,7 @@ laadbeurten = jaarlijkse_afstand*battery_efficiency/battery_actual; %aantal laad
 energy_year = laadbeurten*battery_actual*aantal_autos; %kWh per jaar per auto
 energy_day = energy_year/365;
 Nissan_cost = 30000; %aankoop kost nissan leaf
-Nissan_resale = 16.02*Nissan_cost; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
+Nissan_resale = 0.1602*Nissan_cost; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
 
 %data charging stations
 aantal_chargers = 500;
