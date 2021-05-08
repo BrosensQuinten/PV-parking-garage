@@ -71,6 +71,7 @@ for j = 1:lifetime
 
     end
     ev_charge_max_temp = (1-degradation_battery_yearly)*ev_charge_max_temp;
+    ev_charge_initial = ev_initial(aantal_autos,aantal_chargers,energy_day,ev_charge_max_temp);
 end
 
 %% fast charging optimalization
@@ -110,19 +111,19 @@ capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional in
 opex_diesel = aantal_autos*(Citroen_fuel_cost+Citroen_maintanance);
 %savings = opex_diesel-opex_ev;
 NPV = - capex;
-j = 1;
+year = 1;
 for i=1:time_horizon
     NPV = NPV + savings/(1+discount_rate)^i;
-    opex_ev = sum(fval_slow(:,:,mod(i,lifetime)));
+    opex_ev = sum(fval_slow(:,:,year));
     savings = opex_diesel-opex_ev;
     if rem(i,lifetime) == 0
         NPV = NPV - aantal_autos*(Nissan_cost-Citroen_kost - (Nissan_resale-Citroen_resale) )/(1+discount_rate)^i;
     end
     
-    if rem(j,lifetime) == 0
-        j = j+1;
+    if year == lifetime
+        year = 1;
     else
-        j = 
+        year = year + 1; 
     end
     
     
