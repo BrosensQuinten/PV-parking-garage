@@ -51,13 +51,14 @@ ev_charge_max = battery_actual * aantal_autos; %
 charge_initial = ev_charge_initial;
 charge_max = ev_charge_max;
 
+%% Battery degradation
 
 %% belpex waarden formatteren
 Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
 Belpex = flip(Belpex(9:17,:))/1000;
 
 %% slow charging optimalization
-
+for j = 1:
 for i = 1:size(Belpex,2)
 %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
 %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
@@ -91,6 +92,12 @@ end
 %% plotjes battery charge
 [battery_slow] = battery_charge(x_slow, charge_initial);
 %[battery_fast] = battery_charge(x_fast, fast_charge_initial);
+
+%% Battery degradation
+
+yearly_depletion = battery_depletion(battery_slow,aantal_autos);
+
+
 %% NPV berekening
 electricity_cost = sum(fval_slow);% + sum(fval_fast); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
