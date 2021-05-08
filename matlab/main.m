@@ -5,8 +5,8 @@ date = ["07 01 2020.mat"; "07 04 2020.mat";"07 07 2020.mat"; "07 10 2020.mat"];
 av_commute = 23; %km
 jaarlijkse_afstand = 15000; %km/auto
 aantal_autos = 500; %nog aan te passen 
-lifetime = 10; %gebruikstijd van de bedrijfswagen
-lifetime_chargers = 25;
+lifetime = 4; %gebruikstijd van de bedrijfswagen
+lifetime_chargers = 23;
 time_horizon = lifetime_chargers;
 discount_rate = 0.0477; %nog opzoeken wat de discount rate hiervoor is
 %Nissan leaf data
@@ -19,10 +19,10 @@ laadbeurten = jaarlijkse_afstand*battery_efficiency/battery_actual; %aantal laad
 energy_year = laadbeurten*battery_actual*aantal_autos; %kWh per jaar per auto
 energy_day = energy_year/365;
 Nissan_cost = 30000; %aankoop kost nissan leaf
-Nissan_resale = 0.1602*Nissan_cost; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
+Nissan_resale = 10876; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
 
 %data charging stations
-aantal_chargers = 500;
+aantal_chargers = 250;
 fixed_installation_cost = 12000;
 marginal_installation_cost = 600;
 slow_charger_cost = 3000; 
@@ -33,7 +33,7 @@ max_charging_cap = aantal_chargers*slow_charger_capacity;
 charging_cap = aantal_chargers*slow_charger_capacity;
 % Diesel auto costen
 Citroen_kost = 25903; %aankoopprijs citroen c4
-Citroen_resale = 4255; % resale value na 4 jaar 11785 na tien jaar 4255
+Citroen_resale = 11785; % resale value na 4 jaar 11785 na tien jaar 4255
 Citroen_verbruik = 5.52/100; %l/km
 Diesel_prijs = 1.3445; %euro per liter 
 Diesel_per_jaar = jaarlijkse_afstand *Citroen_verbruik; %l per jaar
@@ -47,7 +47,7 @@ Citroen_maintanance = 500; %euro per jaar BRON ZOEKEN
 ev_charge_initial = ev_initial(aantal_autos,aantal_chargers,energy_day,battery_actual);
 ev_charge = aantal_chargers*(battery_actual-ev_charge_initial);%DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
                           %initial charge of total ev fleet at the start of the day in kwh
-ev_charge_max = battery_actual * aantal_autos; %
+ev_charge_max = battery_actual * aantal_chargers; %
 
 %% fast and slow charging differentiation
 charge_initial = ev_charge_initial;
@@ -60,17 +60,25 @@ Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
 Belpex = flip(Belpex(9:17,:))/1000;
 
 %% slow charging optimalization
-ev_charge_max_temp = ev_charge_max;
+ev_charge_max_temp(1) = ev_charge_max;
 degradation_battery_yearly = 0.042;
 for j = 1:lifetime
     for i = 1:size(Belpex,2)
     %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
     %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
 
-    [x_slow(i,:,j), fval_slow(i,1,j)] = loadProfile(Belpex(:,i), ev_charge_max_temp, charging_cap ,ev_charge_initial);
+    [x_slow(i,:,j), fval_slow(i,1,j)] = loadProfile(Belpex(:,i), ev_charge_max_temp(j), charging_cap ,ev_charge_initial);
 
     end
-    ev_charge_max_temp = (1-degradation_battery_yearly)*ev_charge_max_temp;
+    [battery_slow] = battery_charge(x_slow, charge_initial);
+    yearly_depletion = battery_depletion(battery_slow,aantal_autos);
+    aantal_cycles = yearly_depletion/battery_actual;
+    eq_km = yearly_depletion/battery_efficiency;
+    eq_year = eq_km/15000;
+    ev_charge_max_temp(j+1) = (1-degradation_battery_yearly*eq_year)*ev_charge_max_temp(j);
+    battery_actual = (1-degradation_battery_yearly*eq_year)*battery_actual;
+    ev_charge_initial = ev_initial(aantal_autos,aantal_chargers,energy_day,battery_actual);
+    
 end
 
 %% fast charging optimalization
@@ -85,14 +93,14 @@ end
 %for i = 1: size(
    
 %% plotjes
-x_axis = [9 10 11 12 13 14 15 16 17];
-monthdays = [31 28 31 30 31 30 31 31 30 31 30 31];
-figure
-for i = 1:12
-   subplot(2,6,i)
-   plot(x_axis, x_slow(i,:),x_axis,1000*Belpex(:,sum(monthdays(1:i))));
-   title(i)
-end
+%x_axis = [9 10 11 12 13 14 15 16 17];
+%monthdays = [31 28 31 30 31 30 31 31 30 31 30 31];
+%figure
+%for i = 1:12
+ %  subplot(2,6,i)
+  % plot(x_axis, x_slow(i,:),x_axis,1000*Belpex(:,sum(monthdays(1:i))));
+  % title(i)
+%end
 
 %% plotjes battery charge
 [battery_slow] = battery_charge(x_slow, charge_initial);
@@ -110,23 +118,20 @@ capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional in
 opex_diesel = aantal_autos*(Citroen_fuel_cost+Citroen_maintanance);
 %savings = opex_diesel-opex_ev;
 NPV = - capex;
-j = 1;
+aantal_lifetimes = 0;
+year = 1;
 for i=1:time_horizon
-    NPV = NPV + savings/(1+discount_rate)^i;
-    opex_ev = sum(fval_slow(:,:,mod(i,lifetime)));
+    opex_ev = sum(fval_slow(:,:,year));
     savings = opex_diesel-opex_ev;
+    NPV = NPV + savings/(1+discount_rate)^i;
     if rem(i,lifetime) == 0
         NPV = NPV - aantal_autos*(Nissan_cost-Citroen_kost - (Nissan_resale-Citroen_resale) )/(1+discount_rate)^i;
     end
-    
-    if rem(j,lifetime) == 0
-        j = j+1;
-    else
-        j = 
+    if year == lifetime
+        year =1;
+    else 
+        year = year+1;
     end
-    
-    
-    
 end
 
       
