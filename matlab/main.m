@@ -28,7 +28,7 @@ marginal_installation_cost = 600;
 slow_charger_cost = 3000; 
 charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_chargers +slow_charger_cost*aantal_chargers;
 %fast_charger_capacity = 40; %kW/paal
-slow_charger_capacity = 7.4; %kW/paal
+slow_charger_capacity = 3.6; %kW/paal
 max_charging_cap = aantal_chargers*slow_charger_capacity;
 charging_cap = aantal_chargers*slow_charger_capacity;
 % Diesel auto costen

@@ -12,5 +12,6 @@ for day = 1:365
     end
 end
 yearly_depletion = yearly_depletion/aantal_autos;
+
 end
 
