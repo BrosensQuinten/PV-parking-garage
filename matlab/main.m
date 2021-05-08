@@ -5,7 +5,7 @@ date = ["07 01 2020.mat"; "07 04 2020.mat";"07 07 2020.mat"; "07 10 2020.mat"];
 av_commute = 23; %km
 jaarlijkse_afstand = 15000; %km/auto
 aantal_autos = 500; %nog aan te passen 
-lifetime = 4; %gebruikstijd van de bedrijfswagen
+lifetime = 10; %gebruikstijd van de bedrijfswagen
 lifetime_chargers = 25;
 time_horizon = lifetime_chargers;
 discount_rate = 0.0477; %nog opzoeken wat de discount rate hiervoor is
@@ -19,20 +19,21 @@ laadbeurten = jaarlijkse_afstand*battery_efficiency/battery_actual; %aantal laad
 energy_year = laadbeurten*battery_actual*aantal_autos; %kWh per jaar per auto
 energy_day = energy_year/365;
 Nissan_cost = 30000; %aankoop kost nissan leaf
-Nissan_resale = 0.83*10876; %resalevalue na 4 jaar
+Nissan_resale = 16.02*Nissan_cost; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
 
 %data charging stations
+aantal_chargers = 500;
 fixed_installation_cost = 12000;
 marginal_installation_cost = 600;
 slow_charger_cost = 3000; 
-charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_autos +slow_charger_cost*aantal_autos;
+charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_chargers +slow_charger_cost*aantal_chargers;
 %fast_charger_capacity = 40; %kW/paal
-slow_charger_capacity = 7.4; %kW/paal
-max_charging_cap = aantal_autos*slow_charger_capacity;
-charging_cap = aantal_autos*slow_charger_capacity;
+slow_charger_capacity = 3.6; %kW/paal
+max_charging_cap = aantal_chargers*slow_charger_capacity;
+charging_cap = aantal_chargers*slow_charger_capacity;
 % Diesel auto costen
 Citroen_kost = 25903; %aankoopprijs citroen c4
-Citroen_resale = 11785; % resale value na 4 jaar
+Citroen_resale = 4255; % resale value na 4 jaar 11785 na tien jaar 4255
 Citroen_verbruik = 5.52/100; %l/km
 Diesel_prijs = 1.3445; %euro per liter 
 Diesel_per_jaar = jaarlijkse_afstand *Citroen_verbruik; %l per jaar
@@ -41,9 +42,10 @@ Citroen_maintanance = 500; %euro per jaar BRON ZOEKEN
 
 %% Waarden voor chargen
 %ev_charge = laadbeurten*battery_actual*aantal_autos/365; %total charge needed per day for total ev fleet in kwh
-ev_charge = energy_day;
+
 %max_charging_cap = 5*1000; %max charging capacity in kw
-ev_charge_initial = aantal_autos*battery_actual - ev_charge; %DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
+ev_charge_initial = ev_initial(aantal_autos,aantal_chargers,energy_day,battery_actual);
+ev_charge = aantal_chargers*(battery_actual-ev_charge_initial);%DIT MOET NOG AANGEPAST WORDEN MAAR IK WEET NIET MEER HOE WE DAT BEREKEND HEBBEN
                           %initial charge of total ev fleet at the start of the day in kwh
 ev_charge_max = battery_actual * aantal_autos; %
 
@@ -63,7 +65,7 @@ for i = 1:size(Belpex,2)
 %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
 %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
 
-[x_slow(i,:), fval_slow(i,1)] = loadProfile(Belpex(:,i), charge_max, charging_cap ,charge_initial);
+[x_slow(i,:), fval_slow(i,1)] = loadProfile(Belpex(:,i), charge_max, charging_cap ,ev_charge_initial);
 
 end
 
@@ -107,7 +109,7 @@ savings = opex_diesel-opex_ev;
 NPV = - capex;
 for i=1:time_horizon
     NPV = NPV + savings/(1+discount_rate)^i;
-    if rem(i,4) == 0
+    if rem(i,lifetime) == 0
         NPV = NPV - aantal_autos*(Nissan_cost-Citroen_kost - (Nissan_resale-Citroen_resale) )/(1+discount_rate)^i;
     end
 end
