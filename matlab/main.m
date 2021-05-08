@@ -60,15 +60,18 @@ Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
 Belpex = flip(Belpex(9:17,:))/1000;
 
 %% slow charging optimalization
-for j = 1:
-for i = 1:size(Belpex,2)
-%dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
-%dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
+ev_charge_max_temp = ev_charge_max;
+degradation_battery_yearly = 0.042;
+for j = 1:lifetime
+    for i = 1:size(Belpex,2)
+    %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
+    %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
 
-[x_slow(i,:), fval_slow(i,1)] = loadProfile(Belpex(:,i), charge_max, charging_cap ,ev_charge_initial);
+    [x_slow(i,:,j), fval_slow(i,1,j)] = loadProfile(Belpex(:,i), ev_charge_max_temp, charging_cap ,ev_charge_initial);
 
+    end
+    ev_charge_max_temp = (1-degradation_battery_yearly)*ev_charge_max_temp;
 end
-
 
 %% fast charging optimalization
 %for i = 1:size(Belpex,2)
@@ -101,17 +104,29 @@ yearly_depletion = battery_depletion(battery_slow,aantal_autos);
 
 
 %% NPV berekening
-electricity_cost = sum(fval_slow);% + sum(fval_fast); %kost voor elektriciteit per jaar
+%electricity_cost = sum(fval_slow);% + sum(fval_fast); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
-opex_ev = electricity_cost;
+%opex_ev = electricity_cost;
 opex_diesel = aantal_autos*(Citroen_fuel_cost+Citroen_maintanance);
-savings = opex_diesel-opex_ev;
+%savings = opex_diesel-opex_ev;
 NPV = - capex;
+j = 1;
 for i=1:time_horizon
     NPV = NPV + savings/(1+discount_rate)^i;
+    opex_ev = sum(fval_slow(:,:,mod(i,lifetime)));
+    savings = opex_diesel-opex_ev;
     if rem(i,lifetime) == 0
         NPV = NPV - aantal_autos*(Nissan_cost-Citroen_kost - (Nissan_resale-Citroen_resale) )/(1+discount_rate)^i;
     end
+    
+    if rem(j,lifetime) == 0
+        j = j+1;
+    else
+        j = 
+    end
+    
+    
+    
 end
 
       

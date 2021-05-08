@@ -22,13 +22,13 @@ Nissan_cost = 30000; %aankoop kost nissan leaf
 Nissan_resale = 16.02*Nissan_cost; %resalevalue na 4 jaar = 10876 na 10 jaar = 16.02 %
 
 %data charging stations
-aantal_chargers = 250;
+aantal_chargers = 500;
 fixed_installation_cost = 12000;
 marginal_installation_cost = 600;
 slow_charger_cost = 3000; 
 charger_cost = fixed_installation_cost + marginal_installation_cost*aantal_chargers +slow_charger_cost*aantal_chargers;
 %fast_charger_capacity = 40; %kW/paal
-slow_charger_capacity = 7.4; %kW/paal
+slow_charger_capacity = 3.6; %kW/paal
 max_charging_cap = aantal_chargers*slow_charger_capacity;
 charging_cap = aantal_chargers*slow_charger_capacity;
 % Diesel auto costen
@@ -53,21 +53,22 @@ ev_charge_max = battery_actual * aantal_autos; %
 charge_initial = ev_charge_initial;
 charge_max = ev_charge_max;
 
+%% Battery degradation
 
 %% belpex waarden formatteren
 Belpex = reshape(xlsread('BelpexFilter.xlsx'),24,[]);
 Belpex = flip(Belpex(9:17,:))/1000;
 
 %% slow charging optimalization
+for j = 1:lifetime
+    for i = 1:size(Belpex,2)
+    %dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
+    %dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
 
-for i = 1:size(Belpex,2)
-%dam_prices(:,i) = load(fullfile(pwd, "day ahead market prices", date(i))).dam ; %day ahead market prices
-%dam_9_5(:,i) = dam_prices(10:18,i); %day ahead market prices from 9am till 5pm.
+    [x_slow(j,i,:), fval_slow(i,1)] = loadProfile(Belpex(:,i), charge_max, charging_cap ,ev_charge_initial);
 
-[x_slow(i,:), fval_slow(i,1)] = loadProfile(Belpex(:,i), charge_max, charging_cap ,ev_charge_initial);
-
+    end
 end
-
 
 %% fast charging optimalization
 %for i = 1:size(Belpex,2)
@@ -93,6 +94,12 @@ end
 %% plotjes battery charge
 [battery_slow] = battery_charge(x_slow, charge_initial);
 %[battery_fast] = battery_charge(x_fast, fast_charge_initial);
+
+%% Battery degradation
+
+yearly_depletion = battery_depletion(battery_slow,aantal_autos);
+
+
 %% NPV berekening
 electricity_cost = sum(fval_slow);% + sum(fval_fast); %kost voor elektriciteit per jaar
 capex = aantal_autos*(Nissan_cost - Citroen_kost) + charger_cost; %additional investment cost
